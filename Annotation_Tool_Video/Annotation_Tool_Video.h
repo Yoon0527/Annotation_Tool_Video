@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_Annotation_Tool_Video.h"
+#include <QMediaPlayer>
 
 class Annotation_Tool_Video : public QMainWindow
 {
@@ -13,4 +14,14 @@ public:
 
 private:
     Ui::Annotation_Tool_VideoClass ui;
+    QMediaPlayer* mediaPlayer;
+    bool isPlaying = false;
+
+    QStringList file_list;
+
+    void play_media(QString path);
+
+
+private slots:
+    void load_video();
 };
