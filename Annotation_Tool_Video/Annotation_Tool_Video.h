@@ -19,7 +19,7 @@ private:
 
     QStringList file_list;
 
-    void play_media(QString path);
+    void play_media(const QString& path);
 
 
 private slots:

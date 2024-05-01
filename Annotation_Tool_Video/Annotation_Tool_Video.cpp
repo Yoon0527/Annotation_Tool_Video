@@ -22,10 +22,20 @@ void Annotation_Tool_Video::load_video() {
 
 }
 
-void Annotation_Tool_Video::play_media(QString path) {
-    mediaPlayer->setSource(QUrl::fromLocalFile(path));
-    mediaPlayer->setVideoOutput(ui.lbl_video);
+void Annotation_Tool_Video::play_media(const QString &path) {
+    QMediaPlayer* player = new QMediaPlayer(this);
+
+    //mediaPlayer->setSource(QUrl::fromLocalFile(path));
+    //mediaPlayer->setVideoOutput(ui.lbl_video);
+    //ui.lbl_video->show();
+    //mediaPlayer->play();
+    //isPlaying = true;
+
     ui.lbl_video->show();
-    mediaPlayer->play();
+    player->setSource(QUrl::fromLocalFile(path));
+    player->setVideoOutput(ui.lbl_video);
+    
+
+    player->play();
     isPlaying = true;
 }
