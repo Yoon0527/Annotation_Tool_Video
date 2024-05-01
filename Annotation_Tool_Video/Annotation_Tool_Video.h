@@ -12,6 +12,8 @@ public:
     Annotation_Tool_Video(QWidget *parent = nullptr);
     ~Annotation_Tool_Video();
 
+    void init_ui();
+
 private:
     Ui::Annotation_Tool_VideoClass ui;
     QMediaPlayer* mediaPlayer;
