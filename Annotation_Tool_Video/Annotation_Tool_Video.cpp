@@ -7,7 +7,7 @@ Annotation_Tool_Video::Annotation_Tool_Video(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    init_ui();
+    //init_ui();
     connect(ui.btn_load, SIGNAL(clicked()), this, SLOT(load_video()));
 }
 
@@ -23,38 +23,18 @@ void Annotation_Tool_Video::load_video() {
 
 }
 
-void Annotation_Tool_Video::init_ui() {
-    QVideoWidget* videoWidget = new QVideoWidget(ui.centralWidget);
-    videoWidget->setObjectName("videoWidget");
-    QSizePolicy sizePolicy2(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Ignored);
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(videoWidget->sizePolicy().hasHeightForWidth());
-    videoWidget->setSizePolicy(sizePolicy2);
-    ui.horizontalLayout->addWidget(videoWidget);
-}
 
-void Annotation_Tool_Video::play_media(const QString &path) {
+void Annotation_Tool_Video::play_media(const QString& path) {
+    // 기존의 비디오 위젯과 플레이어를 멤버 변수로 이동시킵니다.
+    QVideoWidget* videoWidget = new QVideoWidget();
     QMediaPlayer* player = new QMediaPlayer(this);
 
-    //mediaPlayer->setSource(QUrl::fromLocalFile(path));
-    //mediaPlayer->setVideoOutput(ui.lbl_video);
-    //ui.lbl_video->show();
-    //mediaPlayer->play();
-    //isPlaying = true;
-    QVideoWidget* videoWidget = new QVideoWidget(ui.centralWidget);
-    videoWidget->setObjectName("videoWidget");
-    QSizePolicy sizePolicy2(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Ignored);
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(videoWidget->sizePolicy().hasHeightForWidth());
-    videoWidget->setSizePolicy(sizePolicy2);
-    ui.horizontalLayout->addWidget(videoWidget);
+    // 레이아웃 매니저를 사용하여 비디오 위젯의 크기를 부모 위젯에 맞춥니다.
+    QVBoxLayout* layout = new QVBoxLayout(ui.groupBox_video);
+    layout->addWidget(videoWidget);
 
+    // 비디오를 재생하기 전에 비디오 소스를 설정하고 재생합니다.
     player->setSource(QUrl::fromLocalFile(path));
     player->setVideoOutput(videoWidget);
-    
-
     player->play();
-    isPlaying = true;
 }
