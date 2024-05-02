@@ -1,18 +1,27 @@
-#include "Annotation_Tool_Video.h"
+ï»¿#include "Annotation_Tool_Video.h"
 
 #include <QFileDialog>
 #include <QVideoWidget>
-
+#include <QKeyEvent>
 Annotation_Tool_Video::Annotation_Tool_Video(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    //init_ui();
+    init_ui();
+
     connect(ui.btn_load, SIGNAL(clicked()), this, SLOT(load_video()));
+    //connect(this, &Annotation_Tool_Video::spacePressed, this, &Annotation_Tool_Video::togglePlayback);
+
+    //installEventFilter(this);
 }
 
 Annotation_Tool_Video::~Annotation_Tool_Video()
 {}
+
+void Annotation_Tool_Video::init_ui() {
+    QVBoxLayout* layout = new QVBoxLayout(ui.groupBox_video);
+    layout->addWidget(videoWidget);
+}
 
 void Annotation_Tool_Video::load_video() {
     QFileDialog dlg;
@@ -21,20 +30,41 @@ void Annotation_Tool_Video::load_video() {
 
     play_media(file_list[0]);
 
+    installEventFilter(this);
 }
 
 
 void Annotation_Tool_Video::play_media(const QString& path) {
-    // ±âÁ¸ÀÇ ºñµð¿À À§Á¬°ú ÇÃ·¹ÀÌ¾î¸¦ ¸â¹ö º¯¼ö·Î ÀÌµ¿½ÃÅµ´Ï´Ù.
-    QVideoWidget* videoWidget = new QVideoWidget();
-    QMediaPlayer* player = new QMediaPlayer(this);
+    // ê¸°ì¡´ì˜ ë¹„ë””ì˜¤ ìœ„ì ¯ê³¼ í”Œë ˆì´ì–´ë¥¼ ë©¤ë²„ ë³€ìˆ˜ë¡œ ì´ë™ì‹œí‚µë‹ˆë‹¤.
+    
+    //QMediaPlayer* player = new QMediaPlayer(this);
 
-    // ·¹ÀÌ¾Æ¿ô ¸Å´ÏÀú¸¦ »ç¿ëÇÏ¿© ºñµð¿À À§Á¬ÀÇ Å©±â¸¦ ºÎ¸ð À§Á¬¿¡ ¸ÂÃä´Ï´Ù.
-    QVBoxLayout* layout = new QVBoxLayout(ui.groupBox_video);
-    layout->addWidget(videoWidget);
+    // ë ˆì´ì•„ì›ƒ ë§¤ë‹ˆì €ë¥¼ ì‚¬ìš©í•˜ì—¬ ë¹„ë””ì˜¤ ìœ„ì ¯ì˜ í¬ê¸°ë¥¼ ë¶€ëª¨ ìœ„ì ¯ì— ë§žì¶¥ë‹ˆë‹¤.
+    //QVBoxLayout* layout = new QVBoxLayout(ui.groupBox_video);
+    //layout->addWidget(videoWidget);
 
-    // ºñµð¿À¸¦ Àç»ýÇÏ±â Àü¿¡ ºñµð¿À ¼Ò½º¸¦ ¼³Á¤ÇÏ°í Àç»ýÇÕ´Ï´Ù.
+    // ë¹„ë””ì˜¤ë¥¼ ìž¬ìƒí•˜ê¸° ì „ì— ë¹„ë””ì˜¤ ì†ŒìŠ¤ë¥¼ ì„¤ì •í•˜ê³  ìž¬ìƒí•©ë‹ˆë‹¤.
+    
+    videoWidget->setFocus();
     player->setSource(QUrl::fromLocalFile(path));
     player->setVideoOutput(videoWidget);
     player->play();
+    isPlaying = true;
+}
+
+
+bool Annotation_Tool_Video::eventFilter(QObject* obj, QEvent* event) {
+    if (obj == this && event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Space) {
+            if (isPlaying) {
+                player->pause();
+            }
+            else {
+                player->play();
+            }
+            return true; // Event handled
+        }
+    }
+    return QMainWindow::eventFilter(obj, event);
 }
