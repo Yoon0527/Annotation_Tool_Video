@@ -31,13 +31,23 @@ void Annotation_Tool_Video::init_ui() {
 }
 
 void Annotation_Tool_Video::load_video() {
-    QFileDialog dlg;
+    if (file_list.size() != 0) {
 
-    file_list = dlg.getOpenFileNames(this, "Load Media", "", "Media Files (*.mp4 *.avi *.mkv)");
+    }
+    else {
+        file_list.clear();
+        ui.list_filelist->clear();
 
-    play_media(file_list[0]);
+        QFileDialog dlg;
 
-    installEventFilter(this);
+        file_list = dlg.getOpenFileNames(this, "Load Media", "", "Media Files (*.mp4 *.avi *.mkv)");
+
+
+
+        play_media(file_list[0]);
+
+        installEventFilter(this);
+    }
 }
 
 

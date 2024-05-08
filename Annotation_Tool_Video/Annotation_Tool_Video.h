@@ -28,6 +28,7 @@ private:
     qint64 mDuration;
 
     QStringList file_list;
+    QStringList file_name_list;
 
     void play_media(const QString& path);
     void updateDuration(qint64 duration);
