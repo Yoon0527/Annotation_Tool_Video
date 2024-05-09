@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Annotation_Tool_Video</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:rgb(46,52,54);
+color:white;</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -116,7 +120,7 @@
              </sizepolicy>
             </property>
             <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::RightToLeft</enum>
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
             </property>
            </widget>
           </item>
@@ -227,7 +231,7 @@
              </sizepolicy>
             </property>
             <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::RightToLeft</enum>
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
             </property>
            </widget>
           </item>

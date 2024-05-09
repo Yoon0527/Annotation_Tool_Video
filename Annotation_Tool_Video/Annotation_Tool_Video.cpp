@@ -32,7 +32,35 @@ void Annotation_Tool_Video::init_ui() {
 
 void Annotation_Tool_Video::load_video() {
     if (file_list.size() != 0) {
+        QStringList file_list_tmp = file_list;
+        QStringList differ_list;
 
+        QFileDialog dlg;
+        file_list = dlg.getOpenFileNames(this, "Load Media", "", "Media Files (*.mp4 *.avi *mkv)");
+
+        for (const QString& path : file_list) {
+            if (!file_list_tmp.contains(path)) {
+                differ_list.append(path);
+                file_list_tmp.append(path);
+            }
+        }
+
+        for (int i = 0; i < differ_list.size(); i++) {
+            QString fileName_pre = differ_list[i].section("/", -1);
+            file_name_list.append(fileName_pre.split(".")[0]);
+        }
+
+        std::sort(file_name_list.begin(), file_name_list.end());
+        ui.list_filelist->clear();
+        ui.list_filelist->addItems(file_name_list);
+
+        ui.list_log->addItem(QString(QString::number(differ_list.size()) + "additional videos have been loaded"));
+
+        std::sort(file_list_tmp.begin(), file_list_tmp.end());
+
+        file_list = file_list_tmp;
+        file_list_len = file_list.size();
+        media_count = file_list.indexOf(current_media_path);
     }
     else {
         file_list.clear();
@@ -42,9 +70,26 @@ void Annotation_Tool_Video::load_video() {
 
         file_list = dlg.getOpenFileNames(this, "Load Media", "", "Media Files (*.mp4 *.avi *.mkv)");
 
+        file_name_list.clear();
+
+        for (int i = 0; i < file_list.size(); i++) {
+            QString fileName_pre = file_list[i].section("/", -1);
+            file_name_list.append(fileName_pre.split(".")[0]);
+        }
+
+        ui.list_filelist->addItems(file_name_list);
+
+        file_list_len = file_list.size();
+        QString file_size = QString::number(file_list_len);
+
+        if (file_list_len > 0) {
+            play_media(file_list[0]);
+        }
+
+        ui.list_log->addItem(QString(file_size + " videos Load"));
 
 
-        play_media(file_list[0]);
+        //play_media(file_list[0]);
 
         installEventFilter(this);
     }
@@ -52,7 +97,8 @@ void Annotation_Tool_Video::load_video() {
 
 
 void Annotation_Tool_Video::play_media(const QString& path) {
-    videoWidget->setFocus();
+    //videoWidget->setFocus();
+    videoWidget->setFocusPolicy(Qt::StrongFocus);
     player->setSource(QUrl::fromLocalFile(path));
     player->setVideoOutput(videoWidget);
     player->play();
@@ -70,6 +116,10 @@ void Annotation_Tool_Video::change_status() {
         player->pause();
         ui.btn_play_status->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         isPlaying = false;
+
+        pause_position = player->position();
+        ui.list_log->addItem(QString(QString::number(pause_position) + " time pause"));
+
     }
     else if(!isPlaying){
         player->play();

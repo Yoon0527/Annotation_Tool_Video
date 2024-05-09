@@ -4,6 +4,7 @@
 #include "ui_Annotation_Tool_Video.h"
 #include <QMediaPlayer>
 #include <QVideoWidget>
+
 #include <QKeyEvent>
 
 using namespace std;
@@ -19,16 +20,26 @@ public:
     QVideoWidget* videoWidget = new QVideoWidget();
     QMediaPlayer* player = new QMediaPlayer(this);
 
+
     void init_ui();
 
 private:
     Ui::Annotation_Tool_VideoClass ui;
     QMediaPlayer* mediaPlayer;
     bool isPlaying = false;
+
     qint64 mDuration;
+    int pause_position;
+    
 
     QStringList file_list;
     QStringList file_name_list;
+
+    QString current_media_path;
+
+    int file_list_len;
+    int media_count = 0;
+    int pause_frame;
 
     void play_media(const QString& path);
     void updateDuration(qint64 duration);
