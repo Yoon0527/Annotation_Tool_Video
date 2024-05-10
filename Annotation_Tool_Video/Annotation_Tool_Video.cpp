@@ -3,12 +3,14 @@
 #include <QFileDialog>
 #include <QVideoWidget>
 #include <QKeyEvent>
+#include <QMediaMetaData>
+
 Annotation_Tool_Video::Annotation_Tool_Video(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
     init_ui();
-
+    
     connect(ui.btn_load, SIGNAL(clicked()), this, SLOT(load_video()));
     connect(ui.btn_play_status, SIGNAL(clicked()), this, SLOT(change_status()));
     connect(ui.btn_skip, SIGNAL(clicked()), this, SLOT(click_skip()));
@@ -83,7 +85,11 @@ void Annotation_Tool_Video::load_video() {
         QString file_size = QString::number(file_list_len);
 
         if (file_list_len > 0) {
-            play_media(file_list[0]);
+            //play_media(file_list[0]);
+            capture_.open(file_list[0].toStdString());
+            fps = capture_.get(cv::CAP_PROP_FPS);
+            interval = 1000 / fps;
+            timer_.start(interval);
         }
 
         ui.list_log->addItem(QString(file_size + " videos Load"));
@@ -96,19 +102,63 @@ void Annotation_Tool_Video::load_video() {
 }
 
 
+//void Annotation_Tool_Video::play_media(const QString& path) {
+//    cap.open(path.toStdString());
+//
+//    if (cap.isOpened()) {
+//        videoWidget->setFocusPolicy(Qt::StrongFocus);
+//        player->setSource(QUrl::fromLocalFile(path));
+//        player->setVideoOutput(videoWidget);
+//        player->play();
+//        ui.btn_play_status->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+//        isPlaying = true;
+//
+//
+//        int video_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+//        int video_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+//
+//        connect(player, &QMediaPlayer::durationChanged, this, &Annotation_Tool_Video::durationChanged);
+//        connect(player, &QMediaPlayer::positionChanged, this, &Annotation_Tool_Video::positionChanged);
+//
+//        ui.slider_duration->setRange(0, player->duration() / 1000);
+//    }
+//    
+//    
+//
+//
+//}
+
 void Annotation_Tool_Video::play_media(const QString& path) {
-    //videoWidget->setFocus();
-    videoWidget->setFocusPolicy(Qt::StrongFocus);
-    player->setSource(QUrl::fromLocalFile(path));
-    player->setVideoOutput(videoWidget);
-    player->play();
-    ui.btn_play_status->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-    isPlaying = true;
+    if (!capture_.isOpened())
+    {
+        qDebug() << "Error: No video file opened.";
+        return;
+    }
+    timer_.start();
+}
 
-    connect(player, &QMediaPlayer::durationChanged, this, &Annotation_Tool_Video::durationChanged);
-    connect(player, &QMediaPlayer::positionChanged, this, &Annotation_Tool_Video::positionChanged);
+void Annotation_Tool_Video::updateFrame()
+{
+    cv::Mat frame;
+    capture_ >> frame;
 
-    ui.slider_duration->setRange(0, player->duration() / 1000);
+    if (frame.empty())
+    {
+        timer_.stop();
+        return;
+    }
+
+    QImage qImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+    qImage = qImage.rgbSwapped();
+
+    if (videoWidget)
+    {
+        videoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
+        videoWidget->setUpdatesEnabled(true);
+        videoWidget->show();
+        videoWidget->update();
+        videoWidget->present(qImage);
+    }
 }
 
 void Annotation_Tool_Video::change_status() {
@@ -164,3 +214,27 @@ void Annotation_Tool_Video::positionChanged(qint64 duration) {
     }
     updateDuration(duration / 1000);
 }
+
+//bool Annotation_Tool_Video::eventFilter(QObject* obj, QEvent* event) {
+//    
+//    if (obj == videoWidget) {
+//        if (event->type() == QEvent::MouseButtonPress) {
+//            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+//            if (mouseEvent->button() == Qt::LeftButton) {
+//                startPoint = 
+//            }
+//        }
+//    }
+//}
+//
+//QPoint Annotation_Tool_Video::mapToImageCoordinates(const QPoint& pos)
+//{
+//
+//    if (player || !player->NoMedia) {
+//        QSize imageSize = player->videoOutput()->
+//        QSize labelSize = videoWidget->size();
+//        int x = pos.x() * imageSize.width() / labelSize.width();
+//        int y = pos.y() * imageSize.height() / labelSize.height();
+//        return QPoint(x, y);
+//    }
+//}

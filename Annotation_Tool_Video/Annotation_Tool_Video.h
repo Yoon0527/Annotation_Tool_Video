@@ -4,9 +4,9 @@
 #include "ui_Annotation_Tool_Video.h"
 #include <QMediaPlayer>
 #include <QVideoWidget>
-
+#include <opencv2/opencv.hpp>
 #include <QKeyEvent>
-
+#include <QTimer>
 using namespace std;
 
 class Annotation_Tool_Video : public QMainWindow
@@ -25,12 +25,12 @@ public:
 
 private:
     Ui::Annotation_Tool_VideoClass ui;
-    QMediaPlayer* mediaPlayer;
+    cv::VideoCapture capture_;;
     bool isPlaying = false;
-
+    QTimer timer_;
     qint64 mDuration;
     int pause_position;
-    
+    QSize videoSize;
 
     QStringList file_list;
     QStringList file_name_list;
@@ -44,6 +44,9 @@ private:
     void play_media(const QString& path);
     void updateDuration(qint64 duration);
 
+    double fps;
+    int interval;
+    void updateFrame();
 private slots:
     void load_video();
     void change_status();
@@ -53,7 +56,8 @@ private slots:
     void positionChanged(qint64 duration);
 
 protected:
-    
+    //bool eventFilter(QObject* obj, QEvent* event);
+    //QPoint mapToImageCoordinates(const QPoint& pos);
 
 //signals:
 //    void spacePressed();
